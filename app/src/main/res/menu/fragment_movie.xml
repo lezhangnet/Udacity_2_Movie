@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="net.lezhang.udacity.movie.MainActivity">
+    <item
+        android:id="@+id/sort_mostpopular"
+        android:orderInCategory="10"
+        android:title="@string/sort_mostpopular"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/sort_toprated"
+        android:orderInCategory="10"
+        android:title="@string/sort_toprated"
+        app:showAsAction="never" />
+</menu>

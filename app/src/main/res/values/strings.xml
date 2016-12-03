@@ -1,0 +1,36 @@
+<resources>
+    <!-- insert API key here -->
+    <string name="api_key_movie"></string>
+
+    <string name="app_name">Popular Movies</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_movie_detail">Detail</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- fragment_movie menu -->
+    <string name="sort_mostpopular">Sort by: Most Popular</string>
+    <string name="sort_toprated">Sort by: Top Rated</string>
+
+    <!-- fragment_movie_detail -->
+    <string name="detail_image_description">Poster Image</string>
+    <string name="detail_release">Release Date:</string>
+    <string name="detail_rating">Rating:</string>
+
+    <!-- Strings related to Settings -->
+    <!-- General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_key_sort_order">pref_key_sort_order</string>
+    <string name="pref_title_sort_order">Sort by ...</string>
+    <string name="pref_default_sort_order">1</string>
+    <string-array name="pref_list_sort_order_entries">
+        <item>Most Popular</item>
+        <item>Top Rated</item>
+    </string-array>
+    <string-array name="pref_list_sort_order_values">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+</resources>
