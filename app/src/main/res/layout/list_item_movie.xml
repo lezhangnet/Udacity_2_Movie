@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
-<ImageView
-    android:id="@+id/list_item_movie_imageview"
-    android:layout_width="150dp"
-    android:layout_height="200dp" />
+    <ImageView
+        android:id="@+id/list_item_movie_imageview"
+        android:layout_width="150dp"
+        android:layout_height="200dp" />
+
+    <!-- for debug only
+    <TextView
+        tools:text="TextViewRating"
+        android:layout_height="100dp"
+        android:id="@+id/list_item_movie_textview"
+        android:background="@android:color/transparent"
+        android:textSize="25sp"
+        android:layout_margin="-10dp"
+        android:typeface="normal"
+        android:fontFamily="sans-serif"
+        android:scrollbars="vertical"
+        android:paddingTop="10dp" />
+    -->
 
 </TableLayout>

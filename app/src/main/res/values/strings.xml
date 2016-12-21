@@ -1,7 +1,8 @@
 <resources>
     <!-- insert API key here -->
-    <string name="api_key_movie"></string>
+    <string name="api_key_movie">c2d49f2af3d55918b6cd233f914c4e64</string>
 
+    <string name="package_name">net.lezhang.udacity.movie</string>
     <string name="app_name">Popular Movies</string>
     <string name="action_settings">Settings</string>
 

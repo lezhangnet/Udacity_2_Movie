@@ -119,6 +119,25 @@ public class MovieDataRetriever {
         }
     }
 
+    public static URL getListQueryUrl(int sortOrderInt) {
+        Uri uri = null;
+        if(sortOrderInt == MainActivityFragment.SORT_ORDER_PUPULAR) {
+            uri = Uri.parse(BASE_URL + LIST_POPULAR).buildUpon()
+                    .appendQueryParameter(API_KEY, API_KEY_VALUE)
+                    .build();
+        } else if(sortOrderInt == MainActivityFragment.SORT_ORDER_TOP_RATED) {
+            uri = Uri.parse(BASE_URL + LIST_TOPRATED).buildUpon()
+                    .appendQueryParameter(API_KEY, API_KEY_VALUE)
+                    .build();
+        }
+        try {
+            return new URL(uri.toString());
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Error building list query URL", e);
+            return null;
+        }
+    }
+
     private static final String BASE_URL_IMAGE = "http://image.tmdb.org/t/p/w185/";
 
     public static URL getPosterUrl(String posterPath) {
