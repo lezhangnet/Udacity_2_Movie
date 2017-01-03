@@ -100,25 +100,6 @@ public class MovieDataRetriever {
     private static final String API_KEY =       "api_key";
     private static String API_KEY_VALUE;
 
-    public static URL getListQueryUrl(SortOrder sortOrder) {
-        Uri uri = null;
-        if(sortOrder == SortOrder.POPULAR) {
-            uri = Uri.parse(BASE_URL + LIST_POPULAR).buildUpon()
-                    .appendQueryParameter(API_KEY, API_KEY_VALUE)
-                    .build();
-        } else if(sortOrder == SortOrder.TOP_RATED) {
-            uri = Uri.parse(BASE_URL + LIST_TOPRATED).buildUpon()
-                    .appendQueryParameter(API_KEY, API_KEY_VALUE)
-                    .build();
-        }
-        try {
-            return new URL(uri.toString());
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Error building list query URL", e);
-            return null;
-        }
-    }
-
     public static URL getListQueryUrl(int sortOrderInt) {
         Uri uri = null;
         if(sortOrderInt == MainActivityFragment.SORT_ORDER_PUPULAR) {
