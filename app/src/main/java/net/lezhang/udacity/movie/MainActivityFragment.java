@@ -1,5 +1,8 @@
 package net.lezhang.udacity.movie;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -168,9 +171,17 @@ public class MainActivityFragment extends Fragment
             //new FetchMovieTask(getActivity(), movies, movieArrayAdapter).execute(sortOrder);
             //new FetchMovieTask(getActivity(), movies, movieCursorAdapter).execute(sortOrder);
 
-            Intent intent = new Intent(getActivity(), MovieService.class);
-            intent.putExtra(MovieService.SORTORDER_EXTRA, sortOrder);
-            getActivity().startService(intent);
+            Log.e(LOG_TAG, "zhale: calling service intent");
+            // explicit service intent
+            Intent alarmIntent = new Intent(getActivity(), MovieService.MovieAlarmReceiver.class);
+            alarmIntent.putExtra(MovieService.SORTORDER_EXTRA, sortOrder);
+
+            // wrapping PendingIntent
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent,
+                    PendingIntent.FLAG_ONE_SHOT);
+            AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pendingIntent);
+
         }
     }
 

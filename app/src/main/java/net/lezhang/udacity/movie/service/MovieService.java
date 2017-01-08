@@ -1,9 +1,11 @@
 package net.lezhang.udacity.movie.service;
 
 import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -22,7 +24,7 @@ public class MovieService extends IntentService {
 
     public MovieService() {
         super("MovieService");
-        Log.e(LOG_TAG, "zhale: MovieService()");
+        Log.e(LOG_TAG, "zhale: MovieService() constructor");
     }
 
     @Override
@@ -116,6 +118,19 @@ public class MovieService extends IntentService {
 
         movieCursor.close();
         return movieRowId;
+    }
+
+    public static class MovieAlarmReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.e(LOG_TAG, "zhale: MovieAlarmReceiver: onReceive()");
+            int sortOrderExtra = intent.getIntExtra(SORTORDER_EXTRA, 0);
+
+            Intent serviceIntent = new Intent(context, MovieService.class);
+            serviceIntent.putExtra(MovieService.SORTORDER_EXTRA, sortOrderExtra);
+            context.startService(serviceIntent);
+
+        }
     }
 
 }

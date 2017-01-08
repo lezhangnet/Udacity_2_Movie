@@ -44,6 +44,9 @@
 
         <service
             android:name=".service.MovieService" />
+
+        <receiver
+            android:name=".service.MovieService$MovieAlarmReceiver" />
     </application>
 
 </manifest>
