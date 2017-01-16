@@ -3,6 +3,7 @@ package net.lezhang.udacity.movie;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import net.lezhang.udacity.movie.data.MovieContentProvider;
+
 import java.net.URL;
 
 /**
@@ -18,6 +21,7 @@ import java.net.URL;
  * from a {@link Cursor} to a {@link android.widget.ListView}.
  */
 public class MovieCursorAdapter extends CursorAdapter {
+    private final String LOG_TAG = MovieCursorAdapter.class.getSimpleName();
 
     /**
      * Cache of the children views for a movie list item.
@@ -61,9 +65,18 @@ public class MovieCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        Log.d(LOG_TAG, "bindView(): cursor: " + cursor.getColumnNames());
+
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        String posterPath = cursor.getString(4);
+        //String posterPath = cursor.getString(4); // for movie list
+        String posterPath = cursor.getString(6); // for popular list
+        //Log.d(LOG_TAG, "posterPath from cursor: " + posterPath);
+        //Log.d(LOG_TAG, "cursor test 2: " + cursor.getString(2));
+        //Log.d(LOG_TAG, "cursor test 3: " + cursor.getString(3));
+        //Log.d(LOG_TAG, "cursor test 5: " + cursor.getString(5));
+        //Log.d(LOG_TAG, "cursor test 6: " + cursor.getString(6));
+
         URL posterUrl = MovieDataRetriever.getPosterUrl(posterPath);
         Picasso.with(view.getContext()).load(posterUrl.toString()).into(viewHolder.listPosterView);
 

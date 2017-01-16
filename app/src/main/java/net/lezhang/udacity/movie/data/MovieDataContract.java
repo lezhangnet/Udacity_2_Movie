@@ -11,29 +11,21 @@ import net.lezhang.udacity.movie.R;
 
 public class MovieDataContract {
 
-    /*
-       This seems to be not working as this is needed much earlier than the set().
-
-    private static Context context;
-    public static void setContext(Context c) {
-        context = c;
-        CONTENT_AUTHORITY = context.getString(R.string.package_name);
-    }
-*/
-
     public static final String CONTENT_AUTHORITY = "net.lezhang.udacity.movie";
     public static final Uri    CONTENT_URI_BASE = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String CONTENT_PATH_MOVIE = "movie";
+    public static final String CONTENT_PATH_POPULAR = "popular";
+    public static final String CONTENT_PATH_TOPRATED = "toprated";
+    public static final String CONTENT_PATH_FAVORITE = "favorite";
 
     /* Inner class that defines the table contents of the movie table */
     public static final class MovieEntry implements BaseColumns {
-
         public static final String TABLE_NAME = "movie";
 
         // Column with the foreign key into the location table.
         //public static final String COLUMN_LOC_KEY = "location_id";
 
-        // Movie id of movie db, stored as int
+        // Movie id of movie db, stored as int; foreign key
         public static final String COLUMN_MOVIE_ID = "movie_id";             // column 1
         public static final String COLUMN_TITLE = "title";                   // column 2
         public static final String COLUMN_ORIGINAL_TITLE = "original_title"; // column 3
@@ -44,6 +36,12 @@ public class MovieDataContract {
         // Release date, stored as string
         public static final String COLUMN_RELEASE_DATE = "date";             // column 7
 
+
+        // "content://net.lezhang.udacity.movie/favorite"
+        public static  final Uri CONTENT_URI_FAVORITE =
+                CONTENT_URI_BASE.buildUpon().appendPath(CONTENT_PATH_FAVORITE).build();
+
+        // "content://net.lezhang.udacity.movie/movie"
         public static final Uri CONTENT_URI =
                 CONTENT_URI_BASE.buildUpon().appendPath(CONTENT_PATH_MOVIE).build();
 
@@ -57,7 +55,8 @@ public class MovieDataContract {
 
         /*
             id is the row id returned by inserting the value to db
-         */
+            used for building return uri for insertion ONLY?
+        */
         public static Uri buildMovieUri(long id) {
             //String movieIdStr = Integer.toString(movieId);
             //return CONTENT_URI.buildUpon().appendPath(movieIdStr).build();
@@ -74,4 +73,41 @@ public class MovieDataContract {
             return Integer.parseInt(s);
         }
     }
+
+    public static final class PopularEntry implements BaseColumns {
+        public static final String TABLE_NAME = "popular";
+
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+
+
+        // "content://net.lezhang.udacity.movie/popular"
+        public static  final Uri CONTENT_URI_POPULAR =
+                CONTENT_URI_BASE.buildUpon().appendPath(CONTENT_PATH_POPULAR).build();
+
+
+        public static Uri buildPopularUri(long id) {
+            //String movieIdStr = Integer.toString(movieId);
+            //return CONTENT_URI.buildUpon().appendPath(movieIdStr).build();
+            return ContentUris.withAppendedId(CONTENT_URI_POPULAR, id);
+        }
+
+    }
+
+    public static final class TopRatedEntry implements BaseColumns {
+        public static final String TABLE_NAME = "toprated";
+
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+
+        // "content://net.lezhang.udacity.movie/toprated"
+        public static  final Uri CONTENT_URI_TOPRATED =
+                CONTENT_URI_BASE.buildUpon().appendPath(CONTENT_PATH_TOPRATED).build();
+
+        public static Uri buildTopratedUri(long id) {
+            //String movieIdStr = Integer.toString(movieId);
+            //return CONTENT_URI.buildUpon().appendPath(movieIdStr).build();
+            return ContentUris.withAppendedId(CONTENT_URI_TOPRATED, id);
+        }
+
+    }
+
 }

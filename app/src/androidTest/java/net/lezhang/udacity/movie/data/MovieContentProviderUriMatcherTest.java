@@ -25,8 +25,9 @@ public class MovieContentProviderUriMatcherTest extends AndroidTestCase {
     private static final long TEST_LOCATION_ID = 10L;
 
     // content://net.lezhang.udacity.movie/movie"
-    private static final Uri TEST_MOVIE_DIR = MovieDataContract.MovieEntry.CONTENT_URI;
-    //private static final Uri TEST_WEATHER_WITH_LOCATION_DIR = WeatherContract.WeatherEntry.buildWeatherLocation(LOCATION_QUERY);
+    private static final Uri TEST_MOVIE_LIST_URI =
+            MovieDataContract.MovieEntry.CONTENT_URI;
+    //private static final Uri TEST_MOVIE_TOPRATED_URI =     MovieDataContract.MovieEntry.buildMovieUri();
     //private static final Uri TEST_WEATHER_WITH_LOCATION_AND_DATE_DIR = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(LOCATION_QUERY, TEST_DATE);
     // content://com.example.android.sunshine.app/location"
     //private static final Uri TEST_LOCATION_DIR = WeatherContract.LocationEntry.CONTENT_URI;
@@ -39,9 +40,9 @@ public class MovieContentProviderUriMatcherTest extends AndroidTestCase {
     public void testUriMatcher() {
         UriMatcher testMatcher = MovieContentProvider.buildUriMatcher();
 
-        assertEquals("Error: The MOVIE URI is matched incorrectly.",
-                testMatcher.match(TEST_MOVIE_DIR),
-                MovieContentProvider.MOVIE_CODE);
+        assertEquals("Error: movie list uri is matched incorrectly.",
+                testMatcher.match(TEST_MOVIE_LIST_URI),
+                MovieContentProvider.MOVIE_LIST_CODE);
         /*
         assertEquals("Error: The WEATHER WITH LOCATION URI was matched incorrectly.",
                 testMatcher.match(TEST_WEATHER_WITH_LOCATION_DIR), WeatherProvider.WEATHER_WITH_LOCATION);

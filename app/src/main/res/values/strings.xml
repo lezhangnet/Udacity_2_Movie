@@ -34,4 +34,9 @@
         <item>2</item>
     </string-array>
 
+    <!-- Account type (for sync-adapter authenticator) -->
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">net.lezhang.udacity.movie</string>
+    <string name="content_authority">net.lezhang.udacity.movie</string>
+
 </resources>

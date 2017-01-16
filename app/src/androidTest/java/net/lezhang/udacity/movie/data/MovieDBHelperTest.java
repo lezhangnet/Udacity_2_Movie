@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import net.lezhang.udacity.movie.data.MovieDataContract.MovieEntry;
 
@@ -19,6 +20,7 @@ public class MovieDBHelperTest extends AndroidTestCase {
     }
 
     private void deleteExistingDatabase() {
+        Log.d(LOG_TAG, "deleteExistingDatabase");
         mContext.deleteDatabase(MovieDBHelper.DATABASE_NAME);
     }
 

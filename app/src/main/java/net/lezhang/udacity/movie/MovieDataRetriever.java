@@ -106,7 +106,7 @@ public class MovieDataRetriever {
             uri = Uri.parse(BASE_URL + LIST_POPULAR).buildUpon()
                     .appendQueryParameter(API_KEY, API_KEY_VALUE)
                     .build();
-        } else if(sortOrderInt == MainActivityFragment.SORT_ORDER_TOP_RATED) {
+        } else if(sortOrderInt == MainActivityFragment.SORT_ORDER_TOPRATED) {
             uri = Uri.parse(BASE_URL + LIST_TOPRATED).buildUpon()
                     .appendQueryParameter(API_KEY, API_KEY_VALUE)
                     .build();

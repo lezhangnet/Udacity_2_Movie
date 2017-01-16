@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import net.lezhang.udacity.movie.data.MovieDataContract;
 
 public class MainActivity extends AppCompatActivity implements MainActivityFragment.MovieCallback {
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
     private boolean mTwoPane = false;
@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(LOG_TAG, "onCreate()");
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -34,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             // The detail container view will be present only in the large-screen layouts
             // (res/layout-sw600dp). If this view is present, then the activity should be
             // in two-pane mode.
-            Log.e(LOG_TAG, "Two pane mode detected");
+            Log.d(LOG_TAG, "Two pane mode detected");
             mTwoPane = true;
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
                         .commit();
             }
         } else {
-            Log.e(LOG_TAG, "One pane mode detected");
+            Log.d(LOG_TAG, "One pane mode detected");
             mTwoPane = false;
         }
     }
@@ -65,14 +67,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             startActivity(intent);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onMovieItemSelected(Uri movieUri) {
         if(mTwoPane) {
-            Log.e(LOG_TAG, "zhale: filling detail fragment with movieUri: " + movieUri);
+            Log.d(LOG_TAG, "Filling detail fragment with movieUri: " + movieUri);
             Bundle args = new Bundle();
             args.putParcelable(MovieDetailActivityFragment.DETAIL_URI, movieUri);
 
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
                     .commit();
         } else {
             // start a new activity
-            Log.e(LOG_TAG, "zhale: activating detail activity with movieUri: " + movieUri);
+            Log.d(LOG_TAG, "Activating detail activity with movieUri: " + movieUri);
             Intent intent = new Intent(this, MovieDetailActivity.class)
                     .setData(movieUri);
             startActivity(intent);

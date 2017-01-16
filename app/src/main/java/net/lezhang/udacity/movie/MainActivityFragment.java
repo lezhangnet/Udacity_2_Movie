@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import net.lezhang.udacity.movie.data.MovieDataContract;
 import net.lezhang.udacity.movie.service.MovieService;
+import net.lezhang.udacity.movie.sync.MovieSyncAdapter;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -39,8 +40,10 @@ public class MainActivityFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
     private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
+    private static final int SORT_ORDER_INITIAL = 0;
     public static final int SORT_ORDER_PUPULAR = 1;
-    public static final int SORT_ORDER_TOP_RATED = 2;
+    public static final int SORT_ORDER_TOPRATED = 2;
+    public static final int SORT_ORDER_FAVORITE = 3;
     private int currentSortOrder = -1;
 
     private ArrayList<Movie> movies = new ArrayList<>();
@@ -73,12 +76,13 @@ public class MainActivityFragment extends Fragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(LOG_TAG, "onOptionsItemSelected()");
         int id = item.getItemId();
         if (id == R.id.sort_mostpopular) {
             updateList(SORT_ORDER_PUPULAR);
             return true;
         } else if (id == R.id.sort_toprated) {
-            updateList(SORT_ORDER_TOP_RATED);
+            updateList(SORT_ORDER_TOPRATED);
             return true;
         }
 
@@ -135,14 +139,24 @@ public class MainActivityFragment extends Fragment
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onActivityCreated(): initializing Loader");
+
+        // reading sort order preference
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortOrderPref = prefs.getString(getString(R.string.pref_key_sort_order), "0");
+        int sortOrder = Integer.valueOf(sortOrderPref);
+        currentSortOrder = sortOrder;
+        Log.d(LOG_TAG, "sortOrder: " + sortOrder);
+
         getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onStart() {
+        Log.d(LOG_TAG, "onStart()");
         super.onStart();
-        updateList(0);
+        updateList(SORT_ORDER_INITIAL);
     }
 
     @Override
@@ -154,23 +168,30 @@ public class MainActivityFragment extends Fragment
     }
 
     private void updateList(int sortOrder) {
-        Log.e(LOG_TAG, "zhale: updateList(): sortOrder: " + sortOrder);
+        Log.d(LOG_TAG, "updateList(): sortOrder: " + sortOrder);
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if(sortOrder == 0) {
             // call from onStart(), try to get sortOrder from preference
             String sortOrderPref = prefs.getString(getString(R.string.pref_key_sort_order), "0");
             sortOrder = Integer.valueOf(sortOrderPref);
         } else {
-            // call from menu, store the selected sortOrder to preference
+            // call from menu, store the newly selected sortOrder to preference
             prefs.edit()
                     .putString(getString(R.string.pref_key_sort_order), Integer.toString(sortOrder))
                     .apply();
         }
+        Log.d(LOG_TAG, "sortOrder: " + sortOrder + " currentSortOrder: " + currentSortOrder);
         if(sortOrder != currentSortOrder) {
             currentSortOrder = sortOrder;
             //new FetchMovieTask(getActivity(), movies, movieArrayAdapter).execute(sortOrder);
             //new FetchMovieTask(getActivity(), movies, movieCursorAdapter).execute(sortOrder);
+            MovieSyncAdapter.syncImmediately(getActivity());
+            Log.e(LOG_TAG, "refreshing loader");
+            //getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this); // not working
+            getLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
 
+            /*
             Log.e(LOG_TAG, "zhale: calling service intent");
             // explicit service intent
             Intent alarmIntent = new Intent(getActivity(), MovieService.MovieAlarmReceiver.class);
@@ -181,24 +202,37 @@ public class MainActivityFragment extends Fragment
                     PendingIntent.FLAG_ONE_SHOT);
             AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
             alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pendingIntent);
-
+            */
         }
+
     }
 
 
-    // LoaderManager implementations
+    /// LoaderManager implementations
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        Log.e(LOG_TAG, "zhale: onCreateLoader()");
-        String sortOrder = MovieDataContract.MovieEntry.COLUMN_MOVIE_ID + " ASC";
-        Uri movieUri = MovieDataContract.MovieEntry.CONTENT_URI;
-        return new CursorLoader(getActivity(), movieUri, null, null, null, sortOrder);
+        Log.d(LOG_TAG, "onCreateLoader(): currentSortOrder: " + currentSortOrder);
+        Uri movieUri = null;
+        String cursorSortOrder = null;
+
+//        if(currentSortOrder == 0) {
+        if(currentSortOrder == SORT_ORDER_PUPULAR) {
+            movieUri = MovieDataContract.PopularEntry.CONTENT_URI_POPULAR;
+        } else if (currentSortOrder == SORT_ORDER_TOPRATED) {
+            movieUri = MovieDataContract.TopRatedEntry.CONTENT_URI_TOPRATED;
+        } else { // list all movies
+            movieUri = MovieDataContract.MovieEntry.CONTENT_URI;
+            cursorSortOrder = MovieDataContract.MovieEntry.COLUMN_MOVIE_ID + " ASC";
+        }
+        Log.d(LOG_TAG, "movieUri: " + movieUri);
+        return new CursorLoader(getActivity(), movieUri, null, null, null, cursorSortOrder);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         // data is ready, update UI
-        Log.e(LOG_TAG, "zhale: onLoadFinished(): swapping cursor into CursorAdaptor");
+        Log.d(LOG_TAG, "onLoadFinished(): swapping cursor into CursorAdaptor. " +
+                "cursor count: " + cursor.getCount());
         movieCursorAdapter.swapCursor(cursor);
 
         // restore the selected position
@@ -209,7 +243,7 @@ public class MainActivityFragment extends Fragment
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        Log.e(LOG_TAG, "zhale: onLoaderReset()");
+        Log.d(LOG_TAG, "onLoaderReset()");
         movieCursorAdapter.swapCursor(null);
     }
 
@@ -221,7 +255,7 @@ public class MainActivityFragment extends Fragment
      */
     public interface MovieCallback {
         /**
-         * DetailFragmentCallback for when an item has been selected.
+         * Callback for when an item has been selected.
          */
         public void onMovieItemSelected(Uri movieUri);
     }
