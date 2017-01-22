@@ -12,11 +12,18 @@
     <!-- fragment_movie menu -->
     <string name="sort_mostpopular">Sort by: Most Popular</string>
     <string name="sort_toprated">Sort by: Top Rated</string>
+    <string name="sort_favorite">My Favorite</string>
 
     <!-- fragment_movie_detail -->
     <string name="detail_image_description">Poster Image</string>
     <string name="detail_release">Release Date:</string>
     <string name="detail_rating">Rating:</string>
+    <string name="detail_plot">Plot:</string>
+    <string name="detail_review">Review:</string>
+    <string name="detail_video">Trailer:</string>
+    <string name="button_video">Watch Trailer on YouTube</string>
+    <string name="toggle_favorite_off">Favorite</string>
+    <string name="toggle_favorite_on">UnFavorite</string>
 
     <!-- Strings related to Settings -->
     <!-- General settings -->

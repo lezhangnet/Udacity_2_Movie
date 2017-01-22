@@ -12,11 +12,10 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
-import net.lezhang.udacity.movie.MainActivityFragment;
 import net.lezhang.udacity.movie.data.MovieDataContract.MovieEntry;
 import net.lezhang.udacity.movie.data.MovieDataContract.PopularEntry;
 import net.lezhang.udacity.movie.data.MovieDataContract.TopRatedEntry;
-
+import net.lezhang.udacity.movie.data.MovieDataContract.FavoriteEntry;
 
 public class MovieContentProvider extends ContentProvider {
     private final String LOG_TAG = MovieContentProvider.class.getSimpleName();
@@ -192,6 +191,22 @@ public class MovieContentProvider extends ContentProvider {
             }
             case MOVIE_FAVORITE_CODE: {
                 Log.d(LOG_TAG, "querying favorite movies");
+                SQLiteDatabase db = movieDBHelper.getReadableDatabase();
+
+                SQLiteQueryBuilder favoriteMovieQueryBuilder = new SQLiteQueryBuilder();
+                favoriteMovieQueryBuilder.setTables(
+                        FavoriteEntry.TABLE_NAME + " INNER JOIN " + MovieEntry.TABLE_NAME +
+                                " ON " + FavoriteEntry.TABLE_NAME + "." + FavoriteEntry.COLUMN_MOVIE_ID +
+                                " = " + MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID);
+
+                retCursor = favoriteMovieQueryBuilder.query(db,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
             case MOVIE_LIST_CODE: {
@@ -267,7 +282,7 @@ public class MovieContentProvider extends ContentProvider {
                 if ( _id > 0 )
                     returnUri = MovieEntry.buildMovieUri(_id);
                 else
-                    throw new android.database.SQLException("Failed to insert row into: " + uri);
+                    throw new android.database.SQLException("Failed to insert into: " + uri);
                 break;
             }
             case MOVIE_POPULAR_CODE: {
@@ -275,7 +290,7 @@ public class MovieContentProvider extends ContentProvider {
                 if ( _id > 0 )
                     returnUri = PopularEntry.buildPopularUri(_id);
                 else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                    throw new android.database.SQLException("Failed to insert into " + uri);
                 break;
             }
             case MOVIE_TOPRATED_CODE: {
@@ -283,10 +298,17 @@ public class MovieContentProvider extends ContentProvider {
                 if ( _id > 0 )
                     returnUri = TopRatedEntry.buildTopratedUri(_id);
                 else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                    throw new android.database.SQLException("Failed to insert into " + uri);
                 break;
             }
-
+            case MOVIE_FAVORITE_CODE: {
+                long _id = db.insert(FavoriteEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = FavoriteEntry.buildFavoriteUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert into " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri for insert: " + uri);
         }
@@ -314,6 +336,10 @@ public class MovieContentProvider extends ContentProvider {
             case MOVIE_TOPRATED_CODE:
                 rowsDeleted = db.delete(
                         MovieDataContract.TopRatedEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case MOVIE_FAVORITE_CODE:
+                rowsDeleted = db.delete(
+                        MovieDataContract.FavoriteEntry.TABLE_NAME, selection, selectionArgs);
                 break;
 
             default:

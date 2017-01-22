@@ -5,9 +5,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import net.lezhang.udacity.movie.Movie;
 import net.lezhang.udacity.movie.data.MovieDataContract.MovieEntry;
 import net.lezhang.udacity.movie.data.MovieDataContract.PopularEntry;
+import net.lezhang.udacity.movie.data.MovieDataContract.TopRatedEntry;
+import net.lezhang.udacity.movie.data.MovieDataContract.FavoriteEntry;
 
 public class MovieDBHelper extends SQLiteOpenHelper {
     private final String LOG_TAG = MovieDBHelper.class.getSimpleName();
@@ -15,7 +16,9 @@ public class MovieDBHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     // private static final int DATABASE_VERSION = 1; // only movie table
     // private static final int DATABASE_VERSION = 3; // movie table; popular table
-    private static final int DATABASE_VERSION = 4; // movie table; popular table; toprated table
+    // private static final int DATABASE_VERSION = 4; // movie table; popular table; toprated table
+    // private static final int DATABASE_VERSION = 5; // movie table; popular table; toprated table; favorite table
+    private static final int DATABASE_VERSION = 7; // reviewJson and videoJson columns in movie table
 
     static final String DATABASE_NAME = "movie.db";
 
@@ -37,6 +40,8 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_PLOT_OVERVIEW +  " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_RATING +         " REAL NOT NULL, " +
                 MovieEntry.COLUMN_RELEASE_DATE +   " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_REVIEW_JSON +    " TEXT, " +
+                MovieEntry.COLUMN_VIDEO_JSON +     " TEXT, " +
 
                 // Set up the location column as a foreign key to location table.
                 //" FOREIGN KEY (" + WeatherEntry.COLUMN_LOC_KEY + ") REFERENCES " +
@@ -51,13 +56,19 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 ");";
 
         final String SQL_CREATE_TOPRATED_TABLE = "CREATE TABLE " + MovieDataContract.TopRatedEntry.TABLE_NAME + " (" +
-                PopularEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                PopularEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL" +
+                TopRatedEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                TopRatedEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL" +
                 ");";
 
-        //sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
+        final String SQL_CREATE_FAVORITE_TABLE = "CREATE TABLE " + MovieDataContract.FavoriteEntry.TABLE_NAME + " (" +
+                FavoriteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                FavoriteEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL" +
+                ");";
+
+        sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
         //sqLiteDatabase.execSQL(SQL_CREATE_POPULAR_TABLE);
-        sqLiteDatabase.execSQL(SQL_CREATE_TOPRATED_TABLE);
+        //sqLiteDatabase.execSQL(SQL_CREATE_TOPRATED_TABLE);
+        //sqLiteDatabase.execSQL(SQL_CREATE_FAVORITE_TABLE);
     }
 
     @Override
@@ -65,7 +76,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
         Log.d(LOG_TAG, "onUpgrade() from " + oldVersion + " to " + newVersion);
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
-        //sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 

@@ -15,6 +15,9 @@ public class Movie implements Parcelable {
     private double rating;
     private String releaseDate;
 
+    private String reviewJson;
+    private String videoJson;
+
     public Movie() {
         id =            0;
         title =         "testTitle";
@@ -62,6 +65,20 @@ public class Movie implements Parcelable {
 
     public String getReleaseDate() {
         return releaseDate;
+    }
+
+    public void setReviewJson(String s) {
+        reviewJson = s;
+    }
+    public String getReviewJson() {
+        return reviewJson;
+    }
+
+    public void setVideoJson(String s) {
+        videoJson = s;
+    }
+    public String getVideoJson() {
+        return videoJson;
     }
 
     @Override

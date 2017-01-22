@@ -1,9 +1,29 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/movie_detail_container"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_weight="1" />
+    android:baselineAligned="false"
+    android:orientation="vertical"
+    tools:context="net.lezhang.udacity.movie.MovieDetailActivity">
+
+    <!-- spaceholder for the app bar -->
+    <TextView
+        tools:text=""
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/text_view_detail_spaceholder"
+        android:background="@android:color/transparent"
+        android:textSize="30sp"
+        android:textAlignment="center" />
+
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/movie_detail_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+</LinearLayout>
 
     <!-- old: not for 2-pane
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"

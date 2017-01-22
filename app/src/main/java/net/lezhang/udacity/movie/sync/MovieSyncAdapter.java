@@ -95,12 +95,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
 
         Log.d(LOG_TAG, "sortOrder: " + sortOrder);
 
-        // validate required params
-        //if (sortOrder == 0) {
-        //    Log.e(LOG_TAG, "Invalid sortOrderExtra passed into MovieServide: " + sortOrderExtra);
-        //    return;
-        //}
-
         URL url = MovieDataRetriever.getListQueryUrl(sortOrder);
         String movieListJsonStr = MovieDataRetriever.getJsonStr(url);
 
@@ -116,6 +110,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
             // add movie to movie db
             Log.d(LOG_TAG, "updating movie DB");
             for(Movie m : result) {
+                queryReviewsAndVideos(m);
                 addMovie(m);
             }
 
@@ -259,6 +254,10 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                     m.getPlotOverview());
             movieValues.put(MovieDataContract.MovieEntry.COLUMN_RATING,
                     m.getRating());
+            movieValues.put(MovieDataContract.MovieEntry.COLUMN_REVIEW_JSON,
+                    m.getReviewJson());
+            movieValues.put(MovieDataContract.MovieEntry.COLUMN_VIDEO_JSON,
+                    m.getVideoJson());
 
             // Finally, insert movie data into the database.
             Uri insertedUri = resolver.insert(
@@ -276,6 +275,17 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         return movieRowId;
     }
 
+    private void queryReviewsAndVideos(Movie m) {
+        Log.d(LOG_TAG, "queryReviewsAndVideos()");
+        URL url = MovieDataRetriever.getCommentsUrl(m);
+        String reviewJsonStr = MovieDataRetriever.getJsonStr(url);
+        m.setReviewJson(reviewJsonStr);
+
+        url = MovieDataRetriever.getVideosUrl(m);
+        String videoJsonStr = MovieDataRetriever.getJsonStr(url);
+        m.setVideoJson(videoJsonStr);
+    }
+
     private void updateListDb(Movie[] movies, int sortOrder) {
         Log.d(LOG_TAG, "updateListDb, sortOrder: " + sortOrder);
         Uri listDbUri = null;
@@ -290,7 +300,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
             dbKey = MovieDataContract.TopRatedEntry.COLUMN_MOVIE_ID;
         }
 
-        // delete all records in the table first?
+        // delete all records in the table first
         ContentResolver resolver = getContext().getContentResolver();
         if(listDbUri != null) {
             resolver.delete(listDbUri, null, null);
@@ -305,7 +315,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
             Uri insertedUri = resolver.insert(listDbUri, movieValues);
             Log.d(LOG_TAG, "inserted " + listDbUri + " as " + insertedUri);
         }
-
     }
 
     /**

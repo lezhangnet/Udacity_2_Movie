@@ -36,10 +36,9 @@ public class MovieDataContract {
         // Release date, stored as string
         public static final String COLUMN_RELEASE_DATE = "date";             // column 7
 
+        public static final String COLUMN_REVIEW_JSON = "reviewjson";
+        public static final String COLUMN_VIDEO_JSON = "videojson";
 
-        // "content://net.lezhang.udacity.movie/favorite"
-        public static  final Uri CONTENT_URI_FAVORITE =
-                CONTENT_URI_BASE.buildUpon().appendPath(CONTENT_PATH_FAVORITE).build();
 
         // "content://net.lezhang.udacity.movie/movie"
         public static final Uri CONTENT_URI =
@@ -106,6 +105,23 @@ public class MovieDataContract {
             //String movieIdStr = Integer.toString(movieId);
             //return CONTENT_URI.buildUpon().appendPath(movieIdStr).build();
             return ContentUris.withAppendedId(CONTENT_URI_TOPRATED, id);
+        }
+
+    }
+
+    public static final class FavoriteEntry implements BaseColumns {
+        public static final String TABLE_NAME = "favorite";
+
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+
+        // "content://net.lezhang.udacity.movie/favorite"
+        public static  final Uri CONTENT_URI_FAVORITE =
+                CONTENT_URI_BASE.buildUpon().appendPath(CONTENT_PATH_FAVORITE).build();
+
+        public static Uri buildFavoriteUri(long id) {
+            //String movieIdStr = Integer.toString(movieId);
+            //return CONTENT_URI.buildUpon().appendPath(movieIdStr).build();
+            return ContentUris.withAppendedId(CONTENT_URI_FAVORITE, id);
         }
 
     }

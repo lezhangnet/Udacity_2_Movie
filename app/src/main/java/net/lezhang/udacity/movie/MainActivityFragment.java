@@ -27,7 +27,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import net.lezhang.udacity.movie.data.MovieDataContract;
-import net.lezhang.udacity.movie.service.MovieService;
 import net.lezhang.udacity.movie.sync.MovieSyncAdapter;
 
 import java.net.URL;
@@ -84,8 +83,10 @@ public class MainActivityFragment extends Fragment
         } else if (id == R.id.sort_toprated) {
             updateList(SORT_ORDER_TOPRATED);
             return true;
+        } else if (id == R.id.sort_favorite) {
+            updateList(SORT_ORDER_FAVORITE);
+            return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -146,7 +147,7 @@ public class MainActivityFragment extends Fragment
         String sortOrderPref = prefs.getString(getString(R.string.pref_key_sort_order), "0");
         int sortOrder = Integer.valueOf(sortOrderPref);
         currentSortOrder = sortOrder;
-        Log.d(LOG_TAG, "sortOrder: " + sortOrder);
+        Log.d(LOG_TAG, "sortOrder read from pref: " + sortOrder);
 
         getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
@@ -168,25 +169,39 @@ public class MainActivityFragment extends Fragment
     }
 
     private void updateList(int sortOrder) {
-        Log.d(LOG_TAG, "updateList(): sortOrder: " + sortOrder);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if(sortOrder == 0) {
+        // on initial call, currentSortOrder is already set from pref at this point
+        Log.d(LOG_TAG, "updateList(): sortOrder: " + sortOrder + " currentSortOrder: " + currentSortOrder);
+/*
+        if(sortOrder != SORT_ORDER_INITIAL) {
+            Log.d(LOG_TAG, "initial update, reading from pref");
             // call from onStart(), try to get sortOrder from preference
-            String sortOrderPref = prefs.getString(getString(R.string.pref_key_sort_order), "0");
-            sortOrder = Integer.valueOf(sortOrderPref);
-        } else {
-            // call from menu, store the newly selected sortOrder to preference
-            prefs.edit()
-                    .putString(getString(R.string.pref_key_sort_order), Integer.toString(sortOrder))
-                    .apply();
-        }
-        Log.d(LOG_TAG, "sortOrder: " + sortOrder + " currentSortOrder: " + currentSortOrder);
+            String sortOrderPrefString = prefs.getString(getString(R.string.pref_key_sort_order), "0");
+            sortOrderPref = Integer.valueOf(sortOrderPrefString);
+        } else if(sortOrder != SORT_ORDER_FAVORITE) {
+        */
         if(sortOrder != currentSortOrder) {
-            currentSortOrder = sortOrder;
+            if (sortOrder == SORT_ORDER_PUPULAR || sortOrder == SORT_ORDER_TOPRATED) {
+                // store the newly selected sortOrder to preference
+                // note: initial (0) or favorite (3) is not being persisted
+                Log.d(LOG_TAG, "saving sort order to pref: " + sortOrder);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                prefs.edit()
+                        .putString(getString(R.string.pref_key_sort_order), Integer.toString(sortOrder))
+                        .apply();
+            }
+
+            // on initial, sortOrder is 0 and currentSortOrder is 1 or 2, so will trigger here
+            if(sortOrder != SORT_ORDER_INITIAL) {
+                currentSortOrder = sortOrder;
+            }
+
             //new FetchMovieTask(getActivity(), movies, movieArrayAdapter).execute(sortOrder);
             //new FetchMovieTask(getActivity(), movies, movieCursorAdapter).execute(sortOrder);
-            MovieSyncAdapter.syncImmediately(getActivity());
+            if(sortOrder != SORT_ORDER_FAVORITE) {
+                Log.d(LOG_TAG, "force syncing");
+                MovieSyncAdapter.syncImmediately(getActivity());
+            }
+
             Log.e(LOG_TAG, "refreshing loader");
             //getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this); // not working
             getLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
@@ -220,6 +235,8 @@ public class MainActivityFragment extends Fragment
             movieUri = MovieDataContract.PopularEntry.CONTENT_URI_POPULAR;
         } else if (currentSortOrder == SORT_ORDER_TOPRATED) {
             movieUri = MovieDataContract.TopRatedEntry.CONTENT_URI_TOPRATED;
+        } else if (currentSortOrder == SORT_ORDER_FAVORITE) {
+            movieUri = MovieDataContract.FavoriteEntry.CONTENT_URI_FAVORITE;
         } else { // list all movies
             movieUri = MovieDataContract.MovieEntry.CONTENT_URI;
             cursorSortOrder = MovieDataContract.MovieEntry.COLUMN_MOVIE_ID + " ASC";
