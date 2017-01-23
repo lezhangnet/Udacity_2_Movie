@@ -151,7 +151,7 @@ public class MovieDataRetriever {
 
     public static URL getListQueryUrl(int sortOrderInt) {
         Uri uri = null;
-        if(sortOrderInt == MainActivityFragment.SORT_ORDER_PUPULAR) {
+        if(sortOrderInt == MainActivityFragment.SORT_ORDER_POPULAR) {
             uri = Uri.parse(BASE_URL + LIST_POPULAR).buildUpon()
                     .appendQueryParameter(API_KEY, API_KEY_VALUE)
                     .build();

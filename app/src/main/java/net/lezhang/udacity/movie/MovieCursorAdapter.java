@@ -65,12 +65,10 @@ public class MovieCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        Log.d(LOG_TAG, "bindView(): cursor: " + cursor.getColumnNames());
-
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         //String posterPath = cursor.getString(4); // for movie list
-        String posterPath = cursor.getString(6); // for popular list
+        String posterPath = cursor.getString(6); // for popular/toprated/favorite list
         //Log.d(LOG_TAG, "posterPath from cursor: " + posterPath);
         //Log.d(LOG_TAG, "cursor test 2: " + cursor.getString(2));
         //Log.d(LOG_TAG, "cursor test 3: " + cursor.getString(3));

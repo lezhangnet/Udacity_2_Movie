@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -42,91 +41,31 @@ public class MovieContentProvider extends ContentProvider {
         final String authority = MovieDataContract.CONTENT_AUTHORITY;
 
         // For each type of URI you want to add, create a corresponding code.
-        matcher.addURI(authority, MovieDataContract.CONTENT_PATH_MOVIE, MOVIE_LIST_CODE);
-        matcher.addURI(authority, MovieDataContract.CONTENT_PATH_MOVIE + "/#", MOVIE_DETAIL_CODE);
-        matcher.addURI(authority, MovieDataContract.CONTENT_PATH_POPULAR, MOVIE_POPULAR_CODE);
-        matcher.addURI(authority, MovieDataContract.CONTENT_PATH_TOPRATED, MOVIE_TOPRATED_CODE);
-        matcher.addURI(authority, MovieDataContract.CONTENT_PATH_FAVORITE, MOVIE_FAVORITE_CODE);
+        matcher.addURI(authority, MovieDataContract.CONTENT_PATH_MOVIE,
+                MOVIE_LIST_CODE);
+        matcher.addURI(authority, MovieDataContract.CONTENT_PATH_MOVIE + "/#",
+                MOVIE_DETAIL_CODE);
+        matcher.addURI(authority, MovieDataContract.CONTENT_PATH_POPULAR,
+                MOVIE_POPULAR_CODE);
+        matcher.addURI(authority, MovieDataContract.CONTENT_PATH_TOPRATED,
+                MOVIE_TOPRATED_CODE);
+        matcher.addURI(authority, MovieDataContract.CONTENT_PATH_FAVORITE,
+                MOVIE_FAVORITE_CODE);
         return matcher;
     }
 
 
-    private static final SQLiteQueryBuilder movieQueryBuilder;
-
-    static {
-        //MovieDataContract.setContext(getContext());
-
-        movieQueryBuilder = new SQLiteQueryBuilder();
-/*
-        //This is an inner join which looks like
-        //weather INNER JOIN location ON weather.location_id = location._id
-        sWeatherByLocationSettingQueryBuilder.setTables(
-                WeatherContract.WeatherEntry.TABLE_NAME + " INNER JOIN " +
-                        WeatherContract.LocationEntry.TABLE_NAME +
-                        " ON " + WeatherContract.WeatherEntry.TABLE_NAME +
-                        "." + WeatherContract.WeatherEntry.COLUMN_LOC_KEY +
-                        " = " + WeatherContract.LocationEntry.TABLE_NAME +
-                        "." + WeatherContract.LocationEntry._ID);
-*/
-    }
-
-    /*
-    //location.location_setting = ?
-    private static final String sLocationSettingSelection =
-            WeatherContract.LocationEntry.TABLE_NAME+
-                    "." + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? ";
-
-    //location.location_setting = ? AND date >= ?
-    private static final String sLocationSettingWithStartDateSelection =
-            WeatherContract.LocationEntry.TABLE_NAME+
-                    "." + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
-                    WeatherContract.WeatherEntry.COLUMN_DATE + " >= ? ";
-
-    //location.location_setting = ? AND date = ?
-    private static final String sLocationSettingAndDaySelection =
-            WeatherContract.LocationEntry.TABLE_NAME +
-                    "." + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
-                    WeatherContract.WeatherEntry.COLUMN_DATE + " = ? ";
-
-    private Cursor getWeatherByLocationSetting(Uri uri, String[] projection, String sortOrder) {
-        String locationSetting = WeatherContract.WeatherEntry.getLocationSettingFromUri(uri);
-        long startDate = WeatherContract.WeatherEntry.getStartDateFromUri(uri);
-
-        String[] selectionArgs;
-        String selection;
-
-        if (startDate == 0) {
-            selection = sLocationSettingSelection;
-            selectionArgs = new String[]{locationSetting};
-        } else {
-            selectionArgs = new String[]{locationSetting, Long.toString(startDate)};
-            selection = sLocationSettingWithStartDateSelection;
-        }
-
-        return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder
-        );
-    }
-
-
-*/
-
     @Override
     public boolean onCreate() {
         Log.d(LOG_TAG, "onCreate()");
-        //MovieDataContract.setContext(getContext());
         movieDBHelper = new MovieDBHelper(getContext());
         return true;
     }
 
     @Override
     public String getType(Uri uri) {
-        Log.d(LOG_TAG, "getType()!!!!!!!!!!");
+        // not sure how this is used
+        Log.d(LOG_TAG, "getType()!!!");
         final int match = movieUriMatcher.match(uri);
 
         switch (match) {
@@ -145,7 +84,7 @@ public class MovieContentProvider extends ContentProvider {
                         String   selection,
                         String[] selectionArgs,
                         String   sortOrder) {
-        Log.d(LOG_TAG, "query(): uri: " + uri + " " + sortOrder);
+        Log.d(LOG_TAG, "query(): uri: " + uri);
         Cursor retCursor = null;
         switch (movieUriMatcher.match(uri)) {
             case MOVIE_POPULAR_CODE:
@@ -210,7 +149,7 @@ public class MovieContentProvider extends ContentProvider {
                 break;
             }
             case MOVIE_LIST_CODE: {
-                Log.d(LOG_TAG, "listing all movies");
+                Log.d(LOG_TAG, "listing all movies in DB");
                 SQLiteDatabase db = movieDBHelper.getReadableDatabase();
                 retCursor = db.query(
                         MovieEntry.TABLE_NAME,
@@ -239,45 +178,25 @@ public class MovieContentProvider extends ContentProvider {
                 );
                 break;
             }
-            /*
-            // "location"
-            case LOCATION: {
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        WeatherContract.LocationEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
+            default: {
+                throw new UnsupportedOperationException("Unknown uri for query: " + uri);
             }
-            */
-
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         ContentResolver cr = getContext().getContentResolver();
         retCursor.setNotificationUri(cr, uri);
         return retCursor;
     }
 
-    /*
-        not sure how the returnUri is used?
-     */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        Log.d(LOG_TAG, "insert() for uri: " + uri);
+        // not sure how the returnUri is used?
+        Log.d(LOG_TAG, "insert(): uri: " + uri);
         final SQLiteDatabase db = movieDBHelper.getWritableDatabase();
         final int match = movieUriMatcher.match(uri);
         Uri returnUri = null;
 
         switch (match) {
             case MOVIE_LIST_CODE: {
-                /*
-                normalizeDate(values);
-                */
                 long _id = db.insert(MovieEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     returnUri = MovieEntry.buildMovieUri(_id);
@@ -318,7 +237,7 @@ public class MovieContentProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        Log.d(LOG_TAG, "delete() for uri: " + uri);
+        Log.d(LOG_TAG, "delete(): uri: " + uri);
         final SQLiteDatabase db = movieDBHelper.getWritableDatabase();
         final int match = movieUriMatcher.match(uri);
         int rowsDeleted = 0;
@@ -343,7 +262,7 @@ public class MovieContentProvider extends ContentProvider {
                 break;
 
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri + "match: " + match);
+                throw new UnsupportedOperationException("Unknown uri for delete: " + uri + "match: " + match);
         }
         // Because a null deletes all rows
         if (rowsDeleted != 0) {
@@ -353,40 +272,23 @@ public class MovieContentProvider extends ContentProvider {
         return rowsDeleted;
     }
 
-    /*
-    private void normalizeDate(ContentValues values) {
-        // normalize the date value
-
-        if (values.containsKey(WeatherContract.WeatherEntry.COLUMN_DATE)) {
-            long dateValue = values.getAsLong(WeatherContract.WeatherEntry.COLUMN_DATE);
-            values.put(WeatherContract.WeatherEntry.COLUMN_DATE, WeatherContract.normalizeDate(dateValue));
-        }
-
-    }
-    */
-
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        Log.e(LOG_TAG, "zhale: updating at uri: " + uri);
+        Log.d(LOG_TAG, "updating(): uri: " + uri);
         final SQLiteDatabase db = movieDBHelper.getWritableDatabase();
         final int match = movieUriMatcher.match(uri);
         int rowsUpdated = 0;
 
         switch (match) {
-            case MOVIE_LIST_CODE:
+            case MOVIE_LIST_CODE: {
                 rowsUpdated = db.update(MovieDataContract.MovieEntry.TABLE_NAME,
                         values,
                         selection,
                         selectionArgs);
                 break;
-            /*
-            case LOCATION:
-                rowsUpdated = db.update(WeatherContract.LocationEntry.TABLE_NAME, values, selection,
-                        selectionArgs);
-                break;
-                */
+            }
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+                throw new UnsupportedOperationException("Unknown uri for update: " + uri);
         }
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
@@ -396,7 +298,7 @@ public class MovieContentProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
-        Log.e(LOG_TAG, "zhale: bulkInserting at uri: " + uri);
+        Log.d(LOG_TAG, "bulkInsert(): uri: " + uri);
         final SQLiteDatabase db = movieDBHelper.getWritableDatabase();
         final int match = movieUriMatcher.match(uri);
         switch (match) {

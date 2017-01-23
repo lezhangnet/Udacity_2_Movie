@@ -18,7 +18,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
     // private static final int DATABASE_VERSION = 3; // movie table; popular table
     // private static final int DATABASE_VERSION = 4; // movie table; popular table; toprated table
     // private static final int DATABASE_VERSION = 5; // movie table; popular table; toprated table; favorite table
-    private static final int DATABASE_VERSION = 7; // reviewJson and videoJson columns in movie table
+    private static final int DATABASE_VERSION = 8; // reviewJson and videoJson columns added in movie table
 
     static final String DATABASE_NAME = "movie.db";
 
@@ -43,10 +43,6 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_REVIEW_JSON +    " TEXT, " +
                 MovieEntry.COLUMN_VIDEO_JSON +     " TEXT, " +
 
-                // Set up the location column as a foreign key to location table.
-                //" FOREIGN KEY (" + WeatherEntry.COLUMN_LOC_KEY + ") REFERENCES " +
-                //LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "), " +
-
                 // To assure the application have just one movie entry
                 " UNIQUE (" + MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
@@ -55,20 +51,20 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 PopularEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL" +
                 ");";
 
-        final String SQL_CREATE_TOPRATED_TABLE = "CREATE TABLE " + MovieDataContract.TopRatedEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_TOPRATED_TABLE = "CREATE TABLE " + TopRatedEntry.TABLE_NAME + " (" +
                 TopRatedEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 TopRatedEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL" +
                 ");";
 
-        final String SQL_CREATE_FAVORITE_TABLE = "CREATE TABLE " + MovieDataContract.FavoriteEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_FAVORITE_TABLE = "CREATE TABLE " + FavoriteEntry.TABLE_NAME + " (" +
                 FavoriteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 FavoriteEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL" +
                 ");";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
-        //sqLiteDatabase.execSQL(SQL_CREATE_POPULAR_TABLE);
-        //sqLiteDatabase.execSQL(SQL_CREATE_TOPRATED_TABLE);
-        //sqLiteDatabase.execSQL(SQL_CREATE_FAVORITE_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_POPULAR_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_TOPRATED_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_FAVORITE_TABLE);
     }
 
     @Override
@@ -77,6 +73,10 @@ public class MovieDBHelper extends SQLiteOpenHelper {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PopularEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TopRatedEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FavoriteEntry.TABLE_NAME);
+        // the other tables stores movie id only, which is ok to keep
         onCreate(sqLiteDatabase);
     }
 
